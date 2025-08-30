@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Astronyvia - Invoice Generator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <div class="logo">
+                <img src="asset/Astronyvia removebg.png" alt="Astronyvia" class="logo-img">
+                <h1>Astronyvia</h1>
+            </div>
+            <p class="tagline">Professional Invoice Generator</p>
+        </header>
+
+        <main class="main-content">
+            <div class="invoice-form-container">
+                <h2><i class="fas fa-file-invoice"></i> Create New Invoice</h2>
+                
+                <form id="invoiceForm" class="invoice-form">
+                    <div class="form-section">
+                        <h3><i class="fas fa-building"></i> Company Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="companyName">Company Name</label>
+                                <input type="text" id="companyName" value="Astronyvia" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyWebsite">Website</label>
+                                <input type="url" id="companyWebsite" value="astronyvia.com" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="companyAddress">Company Address</label>
+                                <textarea id="companyAddress" rows="3" readonly>ECB Chattar, Dhaka, Bangladesh</textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyPhone">Phone</label>
+                                <input type="tel" id="companyPhone" value="+880 1521104415" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="companyEmail">Primary Email</label>
+                                <input type="email" id="companyEmail" value="contactus@astronyvia.com" readonly>
+                            </div>
+                            <div class="form-group">
+                                <label for="companyEmail2">Secondary Email</label>
+                                <input type="email" id="companyEmail2" value="info@astronyvia.com" readonly>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="invoiceNumber">Invoice Number</label>
+                                <input type="text" id="invoiceNumber" placeholder="INV-001" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="invoiceDate">Invoice Date</label>
+                                <input type="date" id="invoiceDate" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="dueDate">Due Date</label>
+                                <input type="date" id="dueDate" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="currency">Currency</label>
+                                <select id="currency" required>
+                                    <option value="$">USD ($)</option>
+                                    <option value="€">EUR (€)</option>
+                                    <option value="£">GBP (£)</option>
+                                    <option value="৳">BDT (৳)</option>
+                                    <option value="₹">INR (₹)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-user"></i> Client Information</h3>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientName">Client Name</label>
+                                <input type="text" id="clientName" placeholder="Enter client name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientEmail">Client Email</label>
+                                <input type="email" id="clientEmail" placeholder="Enter client email">
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="clientAddress">Client Address</label>
+                                <textarea id="clientAddress" rows="3" placeholder="Enter client address"></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="clientPhone">Client Phone</label>
+                                <input type="tel" id="clientPhone" placeholder="Enter client phone">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-list"></i> Services & Items</h3>
+                        <div id="servicesContainer">
+                            <div class="service-item">
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Description</label>
+                                        <input type="text" class="service-description" placeholder="Service description" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Quantity</label>
+                                        <input type="number" class="service-quantity" value="1" min="1" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Rate</label>
+                                        <input type="number" class="service-rate" step="0.01" min="0" placeholder="0.00" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Amount</label>
+                                        <input type="text" class="service-amount" readonly>
+                                    </div>
+                                    <button type="button" class="remove-service-btn" onclick="removeService(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button type="button" id="addServiceBtn" class="btn btn-secondary">
+                            <i class="fas fa-plus"></i> Add Service
+                        </button>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-calculator"></i> Summary</h3>
+                        <div class="summary-row">
+                            <span>Subtotal:</span>
+                            <span id="subtotal">$0.00</span>
+                        </div>
+                        <div class="summary-row">
+                            <label for="taxRate">Tax Rate (%):</label>
+                            <input type="number" id="taxRate" value="0" min="0" max="100" step="0.01">
+                        </div>
+                        <div class="summary-row">
+                            <span>Tax Amount:</span>
+                            <span id="taxAmount">$0.00</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Total:</span>
+                            <span id="total">$0.00</span>
+                        </div>
+                    </div>
+
+                    <div class="form-section">
+                        <h3><i class="fas fa-comment"></i> Additional Notes</h3>
+                        <div class="form-group">
+                            <label for="notes">Notes</label>
+                            <textarea id="notes" rows="4" placeholder="Enter any additional notes or terms..."></textarea>
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="button" id="previewBtn" class="btn btn-primary">
+                            <i class="fas fa-eye"></i> Preview Invoice
+                        </button>
+                        <button type="button" id="generateBtn" class="btn btn-success">
+                            <i class="fas fa-download"></i> Generate PDF
+                        </button>
+                        <button type="button" id="printBtn" class="btn btn-info">
+                            <i class="fas fa-print"></i> Print Invoice
+                        </button>
+                        <button type="button" id="resetBtn" class="btn btn-warning">
+                            <i class="fas fa-refresh"></i> Reset Form
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="invoicePreview" class="invoice-preview" style="display: none;">
+                <div class="preview-header">
+                    <h3><i class="fas fa-file-invoice"></i> Invoice Preview</h3>
+                    <button type="button" id="closePreview" class="btn btn-secondary">
+                        <i class="fas fa-times"></i> Close
+                    </button>
+                </div>
+                <div id="invoiceContent" class="invoice-content">
+                    <!-- Invoice content will be generated here -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
