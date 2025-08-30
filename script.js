@@ -1,5 +1,7 @@
 // Initialize the invoice system
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Invoice system initializing...');
+    
     // Set default dates
     const today = new Date();
     const dueDate = new Date(today.getTime() + (30 * 24 * 60 * 60 * 1000)); // 30 days from now
@@ -31,7 +33,31 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Trigger initial calculation after a short delay
     setTimeout(() => {
+        // Initialize all amount fields to 0.00
+        const services = document.querySelectorAll('.service-item');
+        const currency = document.getElementById('currency').value;
+        services.forEach(service => {
+            const amountInput = service.querySelector('.service-amount');
+            if (amountInput) {
+                amountInput.value = `${currency}0.00`;
+            }
+        });
+        
         calculateTotals();
+        console.log('Invoice system initialized successfully!');
+        
+        // Debug: Check form field visibility
+        const inputs = document.querySelectorAll('input, textarea, select');
+        console.log('Total form fields found:', inputs.length);
+        inputs.forEach((input, index) => {
+            const computedStyle = window.getComputedStyle(input);
+            console.log(`Field ${index + 1} (${input.id || input.className}):`, {
+                backgroundColor: computedStyle.backgroundColor,
+                color: computedStyle.color,
+                borderColor: computedStyle.borderColor,
+                visible: computedStyle.display !== 'none' && computedStyle.visibility !== 'hidden'
+            });
+        });
     }, 100);
 });
 
@@ -52,14 +78,14 @@ function initializeFirstService() {
             calculateTotals();
         });
         
-        // Set initial amount
-        if (quantityInput.value && rateInput.value) {
-            calculateServiceAmount(quantityInput);
-        }
-        
         // Set initial amount display
         const currency = document.getElementById('currency').value;
         firstService.querySelector('.service-amount').value = `${currency}0.00`;
+        
+        // Calculate initial amount if both values are present
+        if (quantityInput.value && rateInput.value) {
+            calculateServiceAmount(quantityInput);
+        }
     }
 }
 
@@ -100,6 +126,18 @@ function initializeEventListeners() {
         updateCurrencyDisplay();
         calculateTotals();
     });
+    
+    // Initialize amount fields on page load
+    document.addEventListener('DOMContentLoaded', function() {
+        const services = document.querySelectorAll('.service-item');
+        const currency = document.getElementById('currency').value;
+        services.forEach(service => {
+            const amountInput = service.querySelector('.service-amount');
+            if (amountInput) {
+                amountInput.value = `${currency}0.00`;
+            }
+        });
+    });
 }
 
 // Add a new service item
@@ -108,26 +146,38 @@ function addService() {
     const newService = document.createElement('div');
     newService.className = 'service-item';
     newService.innerHTML = `
-        <div class="form-row">
-            <div class="form-group">
-                <label>Description</label>
-                <input type="text" class="service-description" placeholder="Service description" required>
+        <div class="card bg-white shadow-lg mb-6 relative border border-gray-100">
+            <div class="card-body p-6">
+                <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold text-gray-700">Description</span>
+                        </label>
+                        <input type="text" class="service-description input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-purple-500 focus:ring-purple-500" placeholder="Service description" required />
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold text-gray-700">Quantity</span>
+                        </label>
+                        <input type="number" class="service-quantity input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-purple-500 focus:ring-purple-500" value="1" min="1" required />
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold text-gray-700">Rate</span>
+                        </label>
+                        <input type="number" class="service-rate input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-purple-500 focus:ring-purple-500" step="0.01" min="0" placeholder="0.00" required />
+                    </div>
+                    <div class="form-control">
+                        <label class="label">
+                            <span class="label-text font-semibold text-gray-700">Amount</span>
+                        </label>
+                        <input type="text" class="service-amount input input-bordered w-full bg-gray-100 text-gray-600 h-12 border-gray-300" readonly />
+                    </div>
+                </div>
+                <button type="button" class="remove-service-btn btn btn-circle btn-error btn-sm absolute top-2 right-2" onclick="removeService(this)">
+                    <i class="fas fa-trash"></i>
+                </button>
             </div>
-            <div class="form-group">
-                <label>Quantity</label>
-                <input type="number" class="service-quantity" value="1" min="1" required>
-            </div>
-            <div class="form-group">
-                <label>Rate ($)</label>
-                <input type="number" class="service-rate" step="0.01" min="0" placeholder="0.00" required>
-            </div>
-            <div class="form-group">
-                <label>Amount ($)</label>
-                <input type="text" class="service-amount" readonly>
-            </div>
-            <button type="button" class="remove-service-btn" onclick="removeService(this)">
-                <i class="fas fa-trash"></i>
-            </button>
         </div>
     `;
     
@@ -136,6 +186,11 @@ function addService() {
     // Add event listeners to new inputs
     const quantityInput = newService.querySelector('.service-quantity');
     const rateInput = newService.querySelector('.service-rate');
+    const amountInput = newService.querySelector('.service-amount');
+    
+    // Set initial amount to 0.00
+    const currency = document.getElementById('currency').value;
+    amountInput.value = `${currency}0.00`;
     
     quantityInput.addEventListener('input', function() {
         calculateServiceAmount(this);
@@ -158,12 +213,28 @@ function removeService(button) {
 // Calculate amount for a specific service
 function calculateServiceAmount(input) {
     const serviceItem = input.closest('.service-item');
-    const quantity = parseFloat(serviceItem.querySelector('.service-quantity').value) || 0;
-    const rate = parseFloat(serviceItem.querySelector('.service-rate').value) || 0;
+    const quantityInput = serviceItem.querySelector('.service-quantity');
+    const rateInput = serviceItem.querySelector('.service-rate');
+    const amountInput = serviceItem.querySelector('.service-amount');
+    
+    // Get values and validate them
+    const quantity = parseFloat(quantityInput.value);
+    const rate = parseFloat(rateInput.value);
+    
+    // Check if both values are valid numbers
+    if (isNaN(quantity) || isNaN(rate) || quantity < 0 || rate < 0) {
+        // If invalid, set amount to 0.00
+        const currency = document.getElementById('currency').value;
+        amountInput.value = `${currency}0.00`;
+        return;
+    }
+    
+    // Calculate amount
     const amount = quantity * rate;
     
+    // Update amount field
     const currency = document.getElementById('currency').value;
-    serviceItem.querySelector('.service-amount').value = `${currency}${amount.toFixed(2)}`;
+    amountInput.value = `${currency}${amount.toFixed(2)}`;
 }
 
 // Calculate all totals
@@ -171,10 +242,19 @@ function calculateTotals() {
     const services = document.querySelectorAll('.service-item');
     let subtotal = 0;
     
+    console.log('Calculating totals for', services.length, 'services');
+    
     services.forEach(service => {
-        const quantity = parseFloat(service.querySelector('.service-quantity').value) || 0;
-        const rate = parseFloat(service.querySelector('.service-rate').value) || 0;
-        subtotal += quantity * rate;
+        const quantity = parseFloat(service.querySelector('.service-quantity').value);
+        const rate = parseFloat(service.querySelector('.service-rate').value);
+        
+        // Only add to subtotal if both values are valid numbers
+        if (!isNaN(quantity) && !isNaN(rate) && quantity >= 0 && rate >= 0) {
+            subtotal += quantity * rate;
+            console.log('Service:', quantity, 'x', rate, '=', quantity * rate);
+        } else {
+            console.log('Service: Invalid values - quantity:', quantity, 'rate:', rate);
+        }
     });
     
     const taxRate = parseFloat(document.getElementById('taxRate').value) || 0;
@@ -185,6 +265,8 @@ function calculateTotals() {
     document.getElementById('subtotal').textContent = `${currency}${subtotal.toFixed(2)}`;
     document.getElementById('taxAmount').textContent = `${currency}${taxAmount.toFixed(2)}`;
     document.getElementById('total').textContent = `${currency}${total.toFixed(2)}`;
+    
+    console.log('Totals calculated:', { subtotal, taxRate, taxAmount, total, currency });
 }
 
 // Update currency display
@@ -196,7 +278,13 @@ function updateCurrencyDisplay() {
         const amount = service.querySelector('.service-amount').value;
         if (amount && amount !== '0.00') {
             const numericAmount = parseFloat(amount.replace(/[^\d.-]/g, ''));
-            service.querySelector('.service-amount').value = `${currency}${numericAmount.toFixed(2)}`;
+            if (!isNaN(numericAmount)) {
+                service.querySelector('.service-amount').value = `${currency}${numericAmount.toFixed(2)}`;
+            } else {
+                service.querySelector('.service-amount').value = `${currency}0.00`;
+            }
+        } else {
+            service.querySelector('.service-amount').value = `${currency}0.00`;
         }
     });
     
@@ -248,6 +336,9 @@ function resetForm() {
         // Set default currency
         document.getElementById('currency').value = '৳';
         
+        // Set default status
+        document.getElementById('invoiceStatus').value = 'unpaid';
+        
         // Remove all service items except the first one
         const servicesContainer = document.getElementById('servicesContainer');
         const firstService = servicesContainer.querySelector('.service-item');
@@ -297,6 +388,7 @@ function generateInvoiceHTML() {
     const invoiceNumber = document.getElementById('invoiceNumber').value;
     const invoiceDate = document.getElementById('invoiceDate').value;
     const dueDate = document.getElementById('dueDate').value;
+    const invoiceStatus = document.getElementById('invoiceStatus').value;
     
     const clientName = document.getElementById('clientName').value;
     const clientEmail = document.getElementById('clientEmail').value;
@@ -338,95 +430,104 @@ function generateInvoiceHTML() {
     });
     
     return `
-        <div class="invoice-header">
+        <div class="flex justify-between items-start mb-10 pb-8 border-b-2 border-gray-200">
             <div class="company-info">
-                <div class="company-logo">
-                    <img src="asset/Astronyvia removebg.png" alt="${companyName}" class="invoice-logo">
+                <div class="mb-4 text-left">
+                    <img src="asset/Astronyvia removebg.png" alt="${companyName}" class="w-20 h-20 object-contain rounded-lg shadow-lg">
                 </div>
-                <h2>${companyName}</h2>
-                ${companyAddress ? `<p><i class="fas fa-map-marker-alt"></i> ${companyAddress}</p>` : ''}
-                ${companyPhone ? `<p><i class="fas fa-phone"></i> ${companyPhone}</p>` : ''}
-                ${companyEmail ? `<p><i class="fas fa-envelope"></i> ${companyEmail}</p>` : ''}
-                ${companyEmail2 ? `<p><i class="fas fa-envelope"></i> ${companyEmail2}</p>` : ''}
-                <p><i class="fas fa-globe"></i> ${companyWebsite}</p>
+                <h2 class="text-4xl font-bold text-primary-600 mb-3 relative">
+                    ${companyName}
+                    <div class="absolute bottom-0 left-0 w-15 h-1 bg-gradient-to-r from-primary-500 to-secondary-500 rounded-full"></div>
+                </h2>
+                ${companyAddress ? `<p class="text-gray-600 mb-2"><i class="fas fa-map-marker-alt text-primary-500 mr-2"></i>${companyAddress}</p>` : ''}
+                ${companyPhone ? `<p class="text-gray-600 mb-2"><i class="fas fa-phone text-primary-500 mr-2"></i>${companyPhone}</p>` : ''}
+                ${companyEmail ? `<p class="text-gray-600 mb-2"><i class="fas fa-envelope text-primary-500 mr-2"></i>${companyEmail}</p>` : ''}
+                ${companyEmail2 ? `<p class="text-gray-600 mb-2"><i class="fas fa-envelope text-primary-500 mr-2"></i>${companyEmail2}</p>` : ''}
+                <p class="text-gray-600"><i class="fas fa-globe text-primary-500 mr-2"></i>${companyWebsite}</p>
             </div>
-            <div class="invoice-details">
-                <h3>INVOICE</h3>
-                <div class="invoice-meta">
-                    <p><strong>Invoice #:</strong> ${invoiceNumber}</p>
-                    <p><strong>Date:</strong> ${formattedInvoiceDate}</p>
-                    <p><strong>Due Date:</strong> ${formattedDueDate}</p>
-                    <p><strong>Status:</strong> <span class="status-pending">Pending</span></p>
+            <div class="text-right">
+                <h3 class="text-2xl font-bold text-center p-3 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-lg mb-5">INVOICE</h3>
+                <div class="bg-gray-50 p-4 rounded-lg border border-gray-200">
+                    <p class="mb-2 text-gray-700"><strong>Invoice #:</strong> ${invoiceNumber}</p>
+                    <p class="mb-2 text-gray-700"><strong>Date:</strong> ${formattedInvoiceDate}</p>
+                    <p class="mb-2 text-gray-700"><strong>Due Date:</strong> ${formattedDueDate}</p>
+                    <p class="mb-0 text-gray-700"><strong>Status:</strong> <span class="${invoiceStatus === 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'} px-3 py-1 rounded-full text-xs font-semibold uppercase">${invoiceStatus === 'paid' ? 'PAID' : 'UNPAID'}</span></p>
                 </div>
             </div>
         </div>
         
-        <div class="client-info">
-            <h3><i class="fas fa-user"></i> Bill To:</h3>
-            <p class="client-name"><strong>${clientName}</strong></p>
-            ${clientAddress ? `<p><i class="fas fa-map-marker-alt"></i> ${clientAddress}</p>` : ''}
-            ${clientPhone ? `<p><i class="fas fa-phone"></i> ${clientPhone}</p>` : ''}
-            ${clientEmail ? `<p><i class="fas fa-envelope"></i> ${clientEmail}</p>` : ''}
+        <div class="mb-10 p-6 bg-gradient-to-r from-gray-50 to-white rounded-2xl border border-gray-200 border-l-4 border-primary-500">
+            <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                <i class="fas fa-user text-primary-500"></i> Bill To:
+            </h3>
+            <p class="text-xl text-gray-800 mb-4 font-semibold"><strong>${clientName}</strong></p>
+            ${clientAddress ? `<p class="text-gray-600 mb-2"><i class="fas fa-map-marker-alt text-primary-500 mr-2"></i>${clientAddress}</p>` : ''}
+            ${clientPhone ? `<p class="text-gray-600 mb-2"><i class="fas fa-phone text-primary-500 mr-2"></i>${clientPhone}</p>` : ''}
+            ${clientEmail ? `<p class="text-gray-600 mb-2"><i class="fas fa-envelope text-primary-500 mr-2"></i>${clientEmail}</p>` : ''}
         </div>
         
-        <table class="services-table">
+        <table class="w-full border-collapse mb-8 border border-gray-300">
             <thead>
                 <tr>
-                    <th>#</th>
-                    <th>Description</th>
-                    <th>Quantity</th>
-                    <th>Rate</th>
-                    <th class="amount">Amount</th>
+                    <th class="bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-800 text-sm p-4 border-b-2 border-primary-500 text-left w-12">#</th>
+                    <th class="bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-800 text-sm p-4 border-b-2 border-primary-500 text-left w-2/5">Description</th>
+                    <th class="bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-800 text-sm p-4 border-b-2 border-primary-500 text-left w-1/6">Quantity</th>
+                    <th class="bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-800 text-sm p-4 border-b-2 border-primary-500 text-left w-1/6">Rate</th>
+                    <th class="bg-gradient-to-r from-gray-50 to-gray-100 font-semibold text-gray-800 text-sm p-4 border-b-2 border-primary-500 text-right w-1/5">Amount</th>
                 </tr>
             </thead>
             <tbody>
                 ${services.map((service, index) => `
-                    <tr>
-                        <td>${index + 1}</td>
-                        <td>${service.description}</td>
-                        <td>${service.quantity}</td>
-                        <td>${currency}${parseFloat(service.rate).toFixed(2)}</td>
-                        <td class="amount">${currency}${parseFloat(service.amount).toFixed(2)}</td>
+                    <tr class="border-b border-gray-200">
+                        <td class="p-4 text-gray-700 text-center">${index + 1}</td>
+                        <td class="p-4 text-gray-700">${service.description}</td>
+                        <td class="p-4 text-gray-700">${service.quantity}</td>
+                        <td class="p-4 text-gray-700">${currency}${parseFloat(service.rate).toFixed(2)}</td>
+                        <td class="p-4 text-gray-700 text-right font-semibold">${currency}${parseFloat(service.amount).toFixed(2)}</td>
                     </tr>
                 `).join('')}
             </tbody>
         </table>
         
-        <div class="invoice-summary">
-            <div class="summary-item">
+        <div class="text-right mb-8 bg-gray-50 p-6 rounded-2xl border border-gray-200">
+            <div class="flex justify-between items-center py-2 border-b border-gray-200 text-lg">
                 <span>Subtotal:</span>
-                <span>${currency}${subtotal.toFixed(2)}</span>
+                <span class="font-semibold">${currency}${subtotal.toFixed(2)}</span>
             </div>
             ${taxAmount > 0 ? `
-                <div class="summary-item">
+                <div class="flex justify-between items-center py-2 border-b border-gray-200 text-lg">
                     <span>Tax (${document.getElementById('taxRate').value}%):</span>
-                    <span>${currency}${taxAmount.toFixed(2)}</span>
+                    <span class="font-semibold">${currency}${taxAmount.toFixed(2)}</span>
                 </div>
             ` : ''}
-            <div class="summary-item total">
+            <div class="flex justify-between items-center py-4 text-2xl font-bold text-primary-600 border-t-2 border-primary-500 pt-4 mt-2">
                 <span>Total Amount:</span>
-                <span>${currency}${total.toFixed(2)}</span>
+                <span class="font-bold">${currency}${total.toFixed(2)}</span>
             </div>
         </div>
         
-        <div class="invoice-footer">
+        <div class="mt-10 pt-8 border-t-2 border-gray-200">
             ${notes ? `
-                <div class="notes-section">
-                    <h3><i class="fas fa-comment"></i> Notes & Terms:</h3>
-                    <p>${notes}</p>
+                <div class="mb-8 pt-6 border-t border-gray-200">
+                    <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                        <i class="fas fa-comment text-primary-500"></i> Notes & Terms:
+                    </h3>
+                    <p class="text-gray-600 leading-relaxed">${notes}</p>
                 </div>
             ` : ''}
             
-            <div class="payment-info">
-                <h3><i class="fas fa-credit-card"></i> Payment Information:</h3>
-                <p><strong>Payment Terms:</strong> Net 30 days</p>
-                <p><strong>Payment Method:</strong> Bank Transfer / Online Payment</p>
-                <p><strong>Due Date:</strong> ${formattedDueDate}</p>
+            <div class="mb-8 p-6 bg-gray-50 rounded-2xl border-l-4 border-green-500">
+                <h3 class="text-xl font-semibold mb-4 text-gray-800 flex items-center gap-2">
+                    <i class="fas fa-credit-card text-green-500"></i> Payment Information:
+                </h3>
+                <p class="text-gray-600 mb-2"><strong>Payment Terms:</strong> Net 30 days</p>
+                <p class="text-gray-600 mb-2"><strong>Payment Method:</strong> Bank Transfer / Online Payment</p>
+                <p class="text-gray-600 mb-0"><strong>Due Date:</strong> ${formattedDueDate}</p>
             </div>
             
-            <div class="thank-you">
-                <p>Thank you for your business!</p>
-                <p class="company-signature">${companyName}</p>
+            <div class="text-center p-5 bg-gradient-to-r from-primary-500 to-secondary-500 text-white rounded-2xl">
+                <p class="text-lg mb-2">Thank you for your business!</p>
+                <p class="text-2xl font-bold mt-4">${companyName}</p>
             </div>
         </div>
     `;
@@ -592,7 +693,7 @@ function validateForm() {
             field.style.borderColor = '#dc3545';
             isValid = false;
         } else {
-            field.style.borderColor = '#e1e5e9';
+            field.style.borderColor = '#d1d5db';
         }
     });
     
@@ -634,6 +735,7 @@ function autoSaveForm() {
         companyEmail: document.getElementById('companyEmail').value,
         companyEmail2: document.getElementById('companyEmail2').value,
         currency: document.getElementById('currency').value,
+        invoiceStatus: document.getElementById('invoiceStatus').value,
         clientName: document.getElementById('clientName').value,
         clientEmail: document.getElementById('clientEmail').value,
         clientAddress: document.getElementById('clientAddress').value,
@@ -671,7 +773,68 @@ document.addEventListener('input', function(e) {
     }
 });
 
+// Validate and format numeric inputs
+document.addEventListener('input', function(e) {
+    if (e.target.classList.contains('service-quantity') || e.target.classList.contains('service-rate')) {
+        const value = e.target.value;
+        
+        // Remove any non-numeric characters except decimal point
+        const cleanValue = value.replace(/[^\d.]/g, '');
+        
+        // Ensure only one decimal point
+        const parts = cleanValue.split('.');
+        if (parts.length > 2) {
+            e.target.value = parts[0] + '.' + parts.slice(1).join('');
+        } else {
+            e.target.value = cleanValue;
+        }
+        
+        // Prevent negative values
+        if (parseFloat(e.target.value) < 0) {
+            e.target.value = '0';
+        }
+        
+        // If input is empty or invalid, set amount to 0.00
+        if (!e.target.value || isNaN(parseFloat(e.target.value))) {
+            const serviceItem = e.target.closest('.service-item');
+            const amountInput = serviceItem.querySelector('.service-amount');
+            const currency = document.getElementById('currency').value;
+            amountInput.value = `${currency}0.00`;
+        }
+    }
+});
 
+
+
+// Test form styling function
+function testFormStyling() {
+    console.log('Testing form styling...');
+    const inputs = document.querySelectorAll('input, textarea, select');
+    let issues = 0;
+    
+    inputs.forEach((input, index) => {
+        const computedStyle = window.getComputedStyle(input);
+        const bgColor = computedStyle.backgroundColor;
+        const textColor = computedStyle.color;
+        
+        // Check if fields are visible and properly styled
+        if (bgColor.includes('rgb(0, 0, 0)') || bgColor.includes('rgba(0, 0, 0)')) {
+            console.warn(`Field ${index + 1} has black background:`, input.id || input.className);
+            issues++;
+        }
+        
+        if (textColor.includes('rgb(255, 255, 255)') || textColor.includes('rgba(255, 255, 255)')) {
+            console.warn(`Field ${index + 1} has white text:`, input.id || input.className);
+            issues++;
+        }
+    });
+    
+    if (issues === 0) {
+        console.log('✅ All form fields are properly styled!');
+    } else {
+        console.warn(`⚠️ Found ${issues} styling issues`);
+    }
+}
 
 // Keyboard shortcuts
 document.addEventListener('keydown', function(e) {
@@ -696,5 +859,11 @@ document.addEventListener('keydown', function(e) {
         e.preventDefault();
         autoSaveForm();
         showNotification('Form data saved!', 'success');
+    }
+    
+    // Ctrl/Cmd + T to test styling
+    if ((e.ctrlKey || e.metaKey) && e.key === 't') {
+        e.preventDefault();
+        testFormStyling();
     }
 });

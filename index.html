@@ -1,205 +1,804 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Astronyvia - Invoice Generator</title>
-    <link rel="stylesheet" href="styles.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-</head>
-<body>
-    <div class="container">
-        <header class="header">
-            <div class="logo">
-                <img src="asset/Astronyvia removebg.png" alt="Astronyvia" class="logo-img">
-                <h1>Astronyvia</h1>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/daisyui@4.7.2/dist/full.min.css"
+      rel="stylesheet"
+      type="text/css"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+    <script>
+      tailwind.config = {
+        daisyui: {
+          themes: [
+            {
+              astronyvia: {
+                primary: "#667eea",
+                secondary: "#a855f7",
+                accent: "#37cdbe",
+                neutral: "#ffffff",
+                "base-100": "#ffffff",
+                "base-200": "#f8fafc",
+                "base-300": "#f1f5f9",
+                info: "#3abff8",
+                success: "#36d399",
+                warning: "#fbbd23",
+                error: "#f87272",
+              },
+            },
+          ],
+        },
+        theme: {
+          extend: {
+            fontFamily: {
+              inter: ["Inter", "sans-serif"],
+            },
+            colors: {
+              primary: {
+                50: "#f0f4ff",
+                100: "#e0e9ff",
+                200: "#c7d2fe",
+                300: "#a5b4fc",
+                400: "#818cf8",
+                500: "#667eea",
+                600: "#5b5bd6",
+                700: "#4c51bf",
+                800: "#434190",
+                900: "#3c366b",
+              },
+              secondary: {
+                50: "#faf5ff",
+                100: "#f3e8ff",
+                200: "#e9d5ff",
+                300: "#d8b4fe",
+                400: "#c084fc",
+                500: "#a855f7",
+                600: "#9333ea",
+                700: "#7c3aed",
+                800: "#6b21a8",
+                900: "#581c87",
+              },
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Override DaisyUI dark theme for form inputs */
+      .input,
+      .textarea,
+      .select {
+        background-color: white !important;
+        color: #1f2937 !important;
+        border-color: #d1d5db !important;
+      }
+
+      .input:focus,
+      .textarea:focus,
+      .select:focus {
+        border-color: #3b82f6 !important;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2) !important;
+      }
+
+      .input[readonly],
+      .textarea[readonly] {
+        background-color: #f3f4f6 !important;
+        color: #4b5563 !important;
+      }
+
+      .input[disabled],
+      .textarea[disabled] {
+        background-color: #f3f4f6 !important;
+        color: #4b5563 !important;
+      }
+
+      /* Service amount fields */
+      .service-amount {
+        background-color: #f3f4f6 !important;
+        color: #4b5563 !important;
+      }
+
+      /* Tax rate input */
+      #taxRate {
+        background-color: white !important;
+        color: #1f2937 !important;
+      }
+
+      /* Ensure labels are visible */
+      .label-text {
+        color: #374151 !important;
+      }
+
+      /* Override any remaining DaisyUI dark styles */
+      .form-control .input,
+      .form-control .textarea,
+      .form-control .select {
+        background-color: white !important;
+        color: #1f2937 !important;
+        border-color: #d1d5db !important;
+      }
+
+      /* Ensure service items are properly styled */
+      .service-item .input {
+        background-color: white !important;
+        color: #1f2937 !important;
+      }
+
+      /* Override DaisyUI button styles if needed */
+      .btn {
+        color: inherit !important;
+      }
+
+      @media print {
+        body {
+          background: white !important;
+        }
+        .bg-gradient-to-br {
+          background: white !important;
+        }
+        .shadow-2xl,
+        .shadow-xl,
+        .shadow-lg {
+          box-shadow: none !important;
+        }
+        .backdrop-blur-md {
+          backdrop-filter: none !important;
+        }
+        .bg-white\/95 {
+          background: white !important;
+        }
+        .bg-gray-50 {
+          background: #f9fafb !important;
+        }
+        .text-primary-600 {
+          color: #000 !important;
+        }
+        .text-primary-500 {
+          color: #000 !important;
+        }
+        .bg-gradient-to-r {
+          background: #f3f4f6 !important;
+        }
+        .border-primary-500 {
+          border-color: #000 !important;
+        }
+        .border-l-4 {
+          border-left-width: 3px !important;
+        }
+        .rounded-2xl,
+        .rounded-xl,
+        .rounded-lg {
+          border-radius: 0 !important;
+        }
+        .transform,
+        .hover\:-translate-y-1,
+        .hover\:scale-110 {
+          transform: none !important;
+        }
+        .transition-all {
+          transition: none !important;
+        }
+        .hover\:shadow-xl,
+        .hover\:shadow-lg {
+          box-shadow: none !important;
+        }
+        .hover\:-translate-y-1 {
+          transform: none !important;
+        }
+        .group:hover .group-hover\:translate-x-full {
+          transform: none !important;
+        }
+
+        /* Hide non-essential elements */
+        button,
+        .remove-service-btn {
+          display: none !important;
+        }
+
+        /* Ensure proper page breaks */
+        .invoice-header,
+        .client-info,
+        .services-table,
+        .invoice-summary,
+        .notes-section {
+          page-break-inside: avoid;
+        }
+
+        /* Page setup */
+        @page {
+          margin: 15mm;
+          size: A4;
+        }
+      }
+    </style>
+  </head>
+  <body
+    class="font-inter bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 min-h-screen"
+    data-theme="astronyvia"
+  >
+    <div class="max-w-6xl mx-auto p-5">
+      <header
+        class="text-center mb-10 bg-white/98 p-8 lg:p-10 rounded-3xl shadow-xl backdrop-blur-md relative overflow-hidden border border-white/20"
+      >
+        <div
+          class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-t-3xl"
+        ></div>
+        <div
+          class="flex flex-col lg:flex-row items-center justify-center gap-6 mb-6"
+        >
+          <div class="relative">
+            <img
+              src="asset/Astronyvia removebg.png"
+              alt="Astronyvia"
+              class="w-16 h-16 lg:w-20 lg:h-20 object-contain rounded-2xl shadow-lg transition-all duration-300 hover:scale-110 hover:shadow-xl"
+            />
+            <div
+              class="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-sm"
+            ></div>
+          </div>
+          <h1
+            class="text-4xl lg:text-6xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent drop-shadow-sm"
+          >
+            Astronyvia
+          </h1>
+        </div>
+        <p
+          class="text-lg lg:text-xl text-gray-700 font-medium relative inline-block px-6 lg:px-8 py-3 bg-gradient-to-r from-blue-50 to-purple-50 rounded-full border border-blue-200/50 shadow-sm"
+        >
+          Professional Invoice Generator
+        </p>
+      </header>
+
+      <main class="grid grid-cols-1 gap-6 lg:gap-8 relative">
+        <div
+          class="bg-white/98 p-8 lg:p-12 rounded-3xl shadow-xl backdrop-blur-md relative overflow-hidden border border-white/20"
+        >
+          <div
+            class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-t-3xl"
+          ></div>
+          <h2
+            class="text-center mb-8 lg:mb-10 text-gray-800 text-3xl lg:text-4xl font-bold relative"
+          >
+            <i class="fas fa-file-invoice mr-4 text-blue-600"></i> Create New
+            Invoice
+            <div
+              class="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-20 lg:w-24 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-full"
+            ></div>
+          </h2>
+
+          <form id="invoiceForm" class="invoice-form">
+            <div
+              class="mb-10 p-6 lg:p-8 bg-gradient-to-br from-blue-50/50 to-indigo-50/50 rounded-3xl border-l-4 border-blue-500 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            >
+              <h3
+                class="mb-6 lg:mb-8 text-gray-800 text-xl lg:text-2xl font-bold flex items-center gap-4 relative"
+              >
+                <div class="p-3 bg-blue-100 rounded-xl">
+                  <i class="fas fa-building text-blue-600 text-lg"></i>
+                </div>
+                Company Information
+                <div
+                  class="absolute bottom-0 left-0 w-12 lg:w-16 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
+                ></div>
+              </h3>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Company Name</span
+                    >
+                  </label>
+                  <input
+                    type="text"
+                    id="companyName"
+                    value="Astronyvia"
+                    required
+                    class="input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Website</span
+                    >
+                  </label>
+                  <input
+                    type="url"
+                    id="companyWebsite"
+                    value="astronyvia.com"
+                    required
+                    class="input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Company Address</span
+                    >
+                  </label>
+                  <textarea
+                    id="companyAddress"
+                    rows="3"
+                    readonly
+                    class="textarea textarea-bordered w-full bg-gray-100 text-gray-600 h-24 border-gray-300"
+                    disabled
+                  >
+ECB Chattar, Dhaka, Bangladesh</textarea
+                  >
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Phone</span
+                    >
+                  </label>
+                  <input
+                    type="tel"
+                    id="companyPhone"
+                    value="+880 1521104415"
+                    readonly
+                    class="input input-bordered w-full bg-gray-100 text-gray-600 h-12 border-gray-300"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Primary Email</span
+                    >
+                  </label>
+                  <input
+                    type="email"
+                    id="companyEmail"
+                    value="contactus@astronyvia.com"
+                    readonly
+                    class="input input-bordered w-full bg-gray-100 text-gray-600 h-12 border-gray-300"
+                    disabled
+                  />
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Secondary Email</span
+                    >
+                  </label>
+                  <input
+                    type="email"
+                    id="companyEmail2"
+                    value="info@astronyvia.com"
+                    readonly
+                    class="input input-bordered w-full bg-gray-100 text-gray-600 h-12 border-gray-300"
+                    disabled
+                  />
+                </div>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Invoice Number</span
+                    >
+                  </label>
+                  <input
+                    type="text"
+                    id="invoiceNumber"
+                    placeholder="INV-001"
+                    required
+                    class="input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Invoice Date</span
+                    >
+                  </label>
+                  <input
+                    type="date"
+                    id="invoiceDate"
+                    required
+                    class="input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Due Date</span
+                    >
+                  </label>
+                  <input
+                    type="date"
+                    id="dueDate"
+                    required
+                    class="input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  />
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Currency</span
+                    >
+                  </label>
+                  <select
+                    id="currency"
+                    required
+                    class="select select-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-blue-500"
+                  >
+                    <option value="$">USD ($)</option>
+                    <option value="€">EUR (€)</option>
+                    <option value="£">GBP (£)</option>
+                    <option value="৳">BDT (৳)</option>
+                    <option value="₹">INR (₹)</option>
+                  </select>
+                </div>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      ><i class="fas fa-info-circle text-blue-500 mr-2"></i>Status</span
+                    >
+                  </label>
+                  <select
+                    id="invoiceStatus"
+                    required
+                    class="select select-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-blue-500 focus:ring-blue-500 font-medium"
+                  >
+                    <option value="unpaid">Unpaid</option>
+                    <option value="paid">Paid</option>
+                  </select>
+                </div>
+                <div class="form-control">
+                  <!-- Empty div for grid alignment -->
+                </div>
+              </div>
             </div>
-            <p class="tagline">Professional Invoice Generator</p>
-        </header>
 
-        <main class="main-content">
-            <div class="invoice-form-container">
-                <h2><i class="fas fa-file-invoice"></i> Create New Invoice</h2>
-                
-                <form id="invoiceForm" class="invoice-form">
-                    <div class="form-section">
-                        <h3><i class="fas fa-building"></i> Company Information</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="companyName">Company Name</label>
-                                <input type="text" id="companyName" value="Astronyvia" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="companyWebsite">Website</label>
-                                <input type="url" id="companyWebsite" value="astronyvia.com" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="companyAddress">Company Address</label>
-                                <textarea id="companyAddress" rows="3" readonly>ECB Chattar, Dhaka, Bangladesh</textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="companyPhone">Phone</label>
-                                <input type="tel" id="companyPhone" value="+880 1521104415" readonly>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="companyEmail">Primary Email</label>
-                                <input type="email" id="companyEmail" value="contactus@astronyvia.com" readonly>
-                            </div>
-                            <div class="form-group">
-                                <label for="companyEmail2">Secondary Email</label>
-                                <input type="email" id="companyEmail2" value="info@astronyvia.com" readonly>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="invoiceNumber">Invoice Number</label>
-                                <input type="text" id="invoiceNumber" placeholder="INV-001" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="invoiceDate">Invoice Date</label>
-                                <input type="date" id="invoiceDate" required>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="dueDate">Due Date</label>
-                                <input type="date" id="dueDate" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="currency">Currency</label>
-                                <select id="currency" required>
-                                    <option value="$">USD ($)</option>
-                                    <option value="€">EUR (€)</option>
-                                    <option value="£">GBP (£)</option>
-                                    <option value="৳">BDT (৳)</option>
-                                    <option value="₹">INR (₹)</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3><i class="fas fa-user"></i> Client Information</h3>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="clientName">Client Name</label>
-                                <input type="text" id="clientName" placeholder="Enter client name" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="clientEmail">Client Email</label>
-                                <input type="email" id="clientEmail" placeholder="Enter client email">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="clientAddress">Client Address</label>
-                                <textarea id="clientAddress" rows="3" placeholder="Enter client address"></textarea>
-                            </div>
-                            <div class="form-group">
-                                <label for="clientPhone">Client Phone</label>
-                                <input type="tel" id="clientPhone" placeholder="Enter client phone">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3><i class="fas fa-list"></i> Services & Items</h3>
-                        <div id="servicesContainer">
-                            <div class="service-item">
-                                <div class="form-row">
-                                    <div class="form-group">
-                                        <label>Description</label>
-                                        <input type="text" class="service-description" placeholder="Service description" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Quantity</label>
-                                        <input type="number" class="service-quantity" value="1" min="1" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Rate</label>
-                                        <input type="number" class="service-rate" step="0.01" min="0" placeholder="0.00" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Amount</label>
-                                        <input type="text" class="service-amount" readonly>
-                                    </div>
-                                    <button type="button" class="remove-service-btn" onclick="removeService(this)">
-                                        <i class="fas fa-trash"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <button type="button" id="addServiceBtn" class="btn btn-secondary">
-                            <i class="fas fa-plus"></i> Add Service
-                        </button>
-                    </div>
-
-                    <div class="form-section">
-                        <h3><i class="fas fa-calculator"></i> Summary</h3>
-                        <div class="summary-row">
-                            <span>Subtotal:</span>
-                            <span id="subtotal">$0.00</span>
-                        </div>
-                        <div class="summary-row">
-                            <label for="taxRate">Tax Rate (%):</label>
-                            <input type="number" id="taxRate" value="0" min="0" max="100" step="0.01">
-                        </div>
-                        <div class="summary-row">
-                            <span>Tax Amount:</span>
-                            <span id="taxAmount">$0.00</span>
-                        </div>
-                        <div class="summary-row total">
-                            <span>Total:</span>
-                            <span id="total">$0.00</span>
-                        </div>
-                    </div>
-
-                    <div class="form-section">
-                        <h3><i class="fas fa-comment"></i> Additional Notes</h3>
-                        <div class="form-group">
-                            <label for="notes">Notes</label>
-                            <textarea id="notes" rows="4" placeholder="Enter any additional notes or terms..."></textarea>
-                        </div>
-                    </div>
-
-                    <div class="form-actions">
-                        <button type="button" id="previewBtn" class="btn btn-primary">
-                            <i class="fas fa-eye"></i> Preview Invoice
-                        </button>
-                        <button type="button" id="generateBtn" class="btn btn-success">
-                            <i class="fas fa-download"></i> Generate PDF
-                        </button>
-                        <button type="button" id="printBtn" class="btn btn-info">
-                            <i class="fas fa-print"></i> Print Invoice
-                        </button>
-                        <button type="button" id="resetBtn" class="btn btn-warning">
-                            <i class="fas fa-refresh"></i> Reset Form
-                        </button>
-                    </div>
-                </form>
+            <div
+              class="mb-10 p-6 lg:p-8 bg-gradient-to-br from-indigo-50/50 to-purple-50/50 rounded-3xl border-l-4 border-indigo-500 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            >
+              <h3
+                class="mb-6 lg:mb-8 text-gray-800 text-xl lg:text-2xl font-bold flex items-center gap-4 relative"
+              >
+                <div class="p-3 bg-indigo-100 rounded-xl">
+                  <i class="fas fa-user text-indigo-600 text-lg"></i>
+                </div>
+                Client Information
+                <div
+                  class="absolute bottom-0 left-0 w-12 lg:w-16 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"
+                ></div>
+              </h3>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Client Name</span
+                    >
+                  </label>
+                  <input
+                    type="text"
+                    id="clientName"
+                    placeholder="Enter client name"
+                    required
+                    class="input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Client Email</span
+                    >
+                  </label>
+                  <input
+                    type="email"
+                    id="clientEmail"
+                    placeholder="Enter client email"
+                    class="input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Client Address</span
+                    >
+                  </label>
+                  <textarea
+                    id="clientAddress"
+                    rows="3"
+                    placeholder="Enter client address"
+                    class="textarea textarea-bordered w-full h-24 text-base bg-white text-gray-800 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                    style="min-height: 80px"
+                  ></textarea>
+                </div>
+                <div class="form-control">
+                  <label class="label">
+                    <span class="label-text font-semibold text-gray-700"
+                      >Client Phone</span
+                    >
+                  </label>
+                  <input
+                    type="tel"
+                    id="clientPhone"
+                    placeholder="Enter client phone"
+                    class="input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                  />
+                </div>
+              </div>
             </div>
 
-            <div id="invoicePreview" class="invoice-preview" style="display: none;">
-                <div class="preview-header">
-                    <h3><i class="fas fa-file-invoice"></i> Invoice Preview</h3>
-                    <button type="button" id="closePreview" class="btn btn-secondary">
-                        <i class="fas fa-times"></i> Close
+            <div
+              class="mb-10 p-6 lg:p-8 bg-gradient-to-br from-purple-50/50 to-pink-50/50 rounded-3xl border-l-4 border-purple-500 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            >
+              <h3
+                class="mb-6 lg:mb-8 text-gray-800 text-xl lg:text-2xl font-bold flex items-center gap-4 relative"
+              >
+                <div class="p-3 bg-purple-100 rounded-xl">
+                  <i class="fas fa-list text-purple-600 text-lg"></i>
+                </div>
+                Services & Items
+                <div
+                  class="absolute bottom-0 left-0 w-12 lg:w-16 h-1 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full"
+                ></div>
+              </h3>
+              <div id="servicesContainer">
+                <div
+                  class="card bg-white shadow-lg mb-6 relative border border-gray-100 service-item"
+                >
+                  <div class="card-body p-6">
+                    <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                      <div class="form-control">
+                        <label class="label">
+                          <span class="label-text font-semibold text-gray-700"
+                            >Description</span
+                          >
+                        </label>
+                        <input
+                          type="text"
+                          class="service-description input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                          placeholder="Service description"
+                          required
+                        />
+                      </div>
+                      <div class="form-control">
+                        <label class="label">
+                          <span class="label-text font-semibold text-gray-700"
+                            >Quantity</span
+                          >
+                        </label>
+                        <input
+                          type="number"
+                          class="service-quantity input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                          value="1"
+                          min="1"
+                          required
+                        />
+                      </div>
+                      <div class="form-control">
+                        <label class="label">
+                          <span class="label-text font-semibold text-gray-700"
+                            >Rate</span
+                          >
+                        </label>
+                        <input
+                          type="number"
+                          class="service-rate input input-bordered w-full h-12 text-base bg-white text-gray-800 border-gray-300 focus:border-purple-500 focus:ring-purple-500"
+                          step="0.01"
+                          min="0"
+                          placeholder="0.00"
+                          required
+                        />
+                      </div>
+                      <div class="form-control">
+                        <label class="label">
+                          <span class="label-text font-semibold text-gray-700"
+                            >Amount</span
+                          >
+                        </label>
+                        <input
+                          type="text"
+                          class="service-amount input input-bordered w-full bg-gray-100 text-gray-600 h-12 border-gray-300"
+                          readonly
+                        />
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      class="remove-service-btn btn btn-circle btn-error btn-sm absolute top-2 right-2"
+                      onclick="removeService(this)"
+                    >
+                      <i class="fas fa-trash"></i>
                     </button>
+                  </div>
                 </div>
-                <div id="invoiceContent" class="invoice-content">
-                    <!-- Invoice content will be generated here -->
-                </div>
+              </div>
+              <button
+                type="button"
+                id="addServiceBtn"
+                class="btn w-full max-w-xs mx-auto h-12 text-base font-medium shadow-md hover:shadow-lg transition-all duration-200 bg-purple-600 hover:bg-purple-700 text-white border-0 rounded-lg"
+              >
+                <i class="fas fa-plus mr-2"></i> Add Service
+              </button>
             </div>
-        </main>
+
+            <div
+              class="mb-10 p-6 lg:p-8 bg-gradient-to-br from-emerald-50/50 to-teal-50/50 rounded-3xl border-l-4 border-emerald-500 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            >
+              <h3
+                class="mb-6 lg:mb-8 text-gray-800 text-xl lg:text-2xl font-bold flex items-center gap-4 relative"
+              >
+                <div class="p-3 bg-emerald-100 rounded-xl">
+                  <i class="fas fa-calculator text-emerald-600 text-lg"></i>
+                </div>
+                Summary
+                <div
+                  class="absolute bottom-0 left-0 w-12 lg:w-16 h-1 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full"
+                ></div>
+              </h3>
+              <div class="stats shadow-lg w-full bg-white/80 backdrop-blur-sm">
+                <div class="stat">
+                  <div class="stat-title">Subtotal</div>
+                  <div class="stat-value text-primary" id="subtotal">$0.00</div>
+                </div>
+                <div class="stat">
+                  <div class="stat-title">Tax Rate (%)</div>
+                  <div class="stat-value">
+                    <input
+                      type="number"
+                      id="taxRate"
+                      value="0"
+                      min="0"
+                      max="100"
+                      step="0.01"
+                      class="input input-bordered w-16 h-8 text-sm bg-white text-gray-800 border-gray-300 focus:border-emerald-500 focus:ring-emerald-500"
+                    />
+                  </div>
+                </div>
+                <div class="stat">
+                  <div class="stat-title">Tax Amount</div>
+                  <div class="stat-value text-secondary" id="taxAmount">
+                    $0.00
+                  </div>
+                </div>
+                <div class="stat">
+                  <div class="stat-title">Total</div>
+                  <div class="stat-value text-accent" id="total">$0.00</div>
+                </div>
+              </div>
+            </div>
+
+            <div
+              class="mb-10 p-6 lg:p-8 bg-gradient-to-br from-amber-50/50 to-orange-50/50 rounded-3xl border-l-4 border-amber-500 shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+            >
+              <h3
+                class="mb-6 lg:mb-8 text-gray-800 text-xl lg:text-2xl font-bold flex items-center gap-4 relative"
+              >
+                <div class="p-3 bg-amber-100 rounded-xl">
+                  <i class="fas fa-comment text-amber-600 text-lg"></i>
+                </div>
+                Additional Notes
+                <div
+                  class="absolute bottom-0 left-0 w-12 lg:w-16 h-1 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full"
+                ></div>
+              </h3>
+              <div class="form-control">
+                <label class="label">
+                  <span class="label-text font-semibold text-gray-700"
+                    >Notes</span
+                  >
+                </label>
+                <textarea
+                  id="notes"
+                  rows="4"
+                  placeholder="Enter any additional notes or terms..."
+                  class="textarea textarea-bordered w-full h-28 text-base bg-white text-gray-800 border-gray-300 focus:border-amber-500 focus:ring-amber-500"
+                  style="min-height: 80px"
+                ></textarea>
+              </div>
+            </div>
+
+            <div
+              class="text-center mt-8 lg:mt-10 pt-8 lg:pt-10 border-t-2 border-gray-200 bg-gradient-to-br from-slate-50/80 to-gray-50/80 p-8 lg:p-10 rounded-3xl shadow-lg backdrop-blur-sm"
+            >
+              <div
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 w-full max-w-4xl mx-auto"
+              >
+                <button
+                  type="button"
+                  id="previewBtn"
+                  class="btn w-full h-12 text-base font-medium shadow-md hover:shadow-lg transition-all duration-200 bg-blue-600 hover:bg-blue-700 text-white border-0 rounded-lg"
+                >
+                  <i class="fas fa-eye mr-2"></i> Preview Invoice
+                </button>
+                <button
+                  type="button"
+                  id="generateBtn"
+                  class="btn w-full h-12 text-base font-medium shadow-md hover:shadow-lg transition-all duration-200 bg-green-600 hover:bg-green-700 text-white border-0 rounded-lg"
+                >
+                  <i class="fas fa-download mr-2"></i> Generate PDF
+                </button>
+                <button
+                  type="button"
+                  id="printBtn"
+                  class="btn w-full h-12 text-base font-medium shadow-md hover:shadow-lg transition-all duration-200 bg-cyan-600 hover:bg-cyan-700 text-white border-0 rounded-lg"
+                >
+                  <i class="fas fa-print mr-2"></i> Print Invoice
+                </button>
+                <button
+                  type="button"
+                  id="resetBtn"
+                  class="btn w-full h-12 text-base font-medium shadow-md hover:shadow-lg transition-all duration-200 bg-amber-600 hover:bg-amber-700 text-white border-0 rounded-lg"
+                >
+                  <i class="fas fa-refresh mr-2"></i> Reset Form
+                </button>
+              </div>
+            </div>
+          </form>
+        </div>
+
+        <div
+          id="invoicePreview"
+          class="bg-white/98 p-8 lg:p-10 rounded-3xl shadow-xl backdrop-blur-md relative overflow-hidden border border-white/20"
+          style="display: none"
+        >
+          <div
+            class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-t-3xl"
+          ></div>
+          <div
+            class="flex flex-col lg:flex-row justify-between items-center mb-8 pb-6 border-b-2 border-gray-200 gap-4"
+          >
+            <h3
+              class="text-gray-800 text-2xl lg:text-3xl font-bold flex items-center gap-4 relative"
+            >
+              <div class="p-3 bg-emerald-100 rounded-xl">
+                <i class="fas fa-file-invoice text-emerald-600 text-lg"></i>
+              </div>
+              Invoice Preview
+              <div
+                class="absolute bottom-0 left-0 w-16 lg:w-20 h-1 bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 rounded-full"
+              ></div>
+            </h3>
+            <button
+              type="button"
+              id="closePreview"
+              class="btn h-10 px-4 text-sm font-medium shadow-md hover:shadow-lg transition-all duration-200 bg-gray-600 hover:bg-gray-700 text-white border-0 rounded-lg"
+            >
+              <i class="fas fa-times mr-2"></i> Close
+            </button>
+          </div>
+          <div
+            id="invoiceContent"
+            class="bg-white p-8 lg:p-12 rounded-3xl shadow-xl relative border border-gray-100"
+          >
+            <div
+              class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-blue-500 via-indigo-500 to-purple-500 rounded-t-3xl"
+            ></div>
+            <!-- Invoice content will be generated here -->
+          </div>
+        </div>
+      </main>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="script.js"></script>
-</body>
+  </body>
 </html>
